@@ -6,7 +6,7 @@
 /*   By: geliz <geliz@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/23 17:12:42 by geliz             #+#    #+#             */
-/*   Updated: 2020/01/06 18:27:00 by geliz            ###   ########.fr       */
+/*   Updated: 2020/01/24 20:15:13 by geliz            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ char	*ft_width_to_string(t_info *in, char *str)
 		ret = ft_width_with_minus(in, str, ret);
 	else
 		ret = ft_width_without_minus(in, str, ret);
+	ft_strdel(&str);
 	return (ret);
 }
 
@@ -77,10 +78,12 @@ char	*ft_precision_to_string(t_info *in, char *str)
 	{
 		if (!(ret = ft_strnew(0)))
 			return (NULL);
+		ft_strdel(&str);
 		return (ret);
 	}
 	if (!(ret = ft_strsub(str, 0, in->precision)))
 		return (NULL);
+	ft_strdel(&str);
 	return (ret);
 }
 
@@ -88,18 +91,13 @@ char	*ft_apply_info_to_string(t_info *in, va_list ap)
 {
 	char	*str;
 	char	*ret;
+	char	*temp;
 	size_t	j;
-	int		if_null;
 
 	if (in->size == L_ || in->size == LL_)
 		return (NULL);
-	str = va_arg(ap, char *);
-	if_null = str == NULL ? 1 : 0;
-	if (str == NULL)
-	{
-		if (!(str = ft_strsub("(null)", 0, 6)))
-			return (NULL);
-	}
+	temp = va_arg(ap, char *);
+	str = temp == NULL ? ft_strdup("(null)") : ft_strdup(temp);
 	j = ft_strlen(str);
 	if (in->precision >= 0 && (int)j > in->precision)
 		str = ft_precision_to_string(in, str);
@@ -108,7 +106,6 @@ char	*ft_apply_info_to_string(t_info *in, va_list ap)
 		str = ft_width_to_string(in, str);
 	if (!(ret = ft_strdup(str)))
 		return (NULL);
-	if (if_null == 1)
-		ft_strdel(&str);
+	ft_strdel(&str);
 	return (ret);
 }
